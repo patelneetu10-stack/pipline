@@ -1,0 +1,44 @@
+name: Terraform Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./azurerm_resource_group
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.2"
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: |
+            {
+              "clientId": "${{ f02d5cf1-c684-4e4f-b299-e264f0d0ab02 }}",
+              "clientSecret": "${{ 85c28adb-0b41-4611-8be1-8268edfbbd3c }}",
+              "subscriptionId": "${{ eae9ed0e-cab8-44ca-9e18-d0037d47160d }}",
+              "tenantId": "${{ ebfc9e6e-8fb8-4bb5-8d58-f4b6046d9f7f }}"
+            }
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
